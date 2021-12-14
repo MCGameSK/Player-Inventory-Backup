@@ -1,7 +1,7 @@
 # playerBackup.sk
 Make back-up of player's inventory when the player dies
 ---
->[스크립트 2.6](https://github.com/SkriptLang/Skript/releases) 
+>[스크립트 2.6](https://github.com/SkriptLang/Skript/releases)   
 >based on [Skript 2.6](https://github.com/SkriptLang/Skript/releases)  
 ---
 
