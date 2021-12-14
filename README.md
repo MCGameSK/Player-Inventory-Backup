@@ -6,6 +6,10 @@ Make back-up of player's inventory when the player dies
 ---
 
 
+/pbremoveall
+Deleting log
+
+
 /pbview [name]
 
 
