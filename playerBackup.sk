@@ -1,0 +1,101 @@
+#
+#Github https://github.com/MCGameSK/Player-Inventory-Backup
+#
+
+
+
+on death of player:
+    if {index::%player's uuid%} is not set:
+        set {index::%player's uuid%} to 1
+
+
+
+    if {index::%player's uuid%} <= 1:
+        set {_preindex} to 10
+    else:
+        set {_preindex} to {index::%player's uuid%} - 1
+
+    if {data::%player's uuid%::nows::%{_preindex}%} is set:
+        set {_amount} to 0
+        loop {data::%player's uuid%::inv::%{_preindex}%::*}:
+            add 1 to {_amount}
+        
+        if {_amount} is 0:
+            set {index::%player's uuid%} to {_preindex}
+    
+
+    delete {data::%player's uuid%::inv::%{index::%player's uuid%}%::*}
+    loop all items in player's inventory:
+        add loop-item to {data::%player's uuid%::inv::%{index::%player's uuid%}%::*}
+
+    set {data::%player's uuid%::cause::%{index::%player's uuid%}%} to damage cause
+    set {data::%player's uuid%::attacker::%{index::%player's uuid%}%} to attacker
+    set {data::%player's uuid%::pos::%{index::%player's uuid%}%} to player's location
+    set {data::%player's uuid%::nows::%{index::%player's uuid%}%} to now
+
+    add 1 to {index::%player's uuid%}
+
+    if {index::%player's uuid%} >= 11:
+        set {index::%player's uuid%} to 1
+
+
+
+on inventory click:
+    if current inventory of player is {%player's uuid%::viewer}:
+        if event-inventory is open inventory:
+
+            if index of clicked slot >= 45:
+                cancel event                    
+
+        else:
+            cancel event
+
+
+
+command /pbview [<player>]:
+    trigger:
+        if player is op:
+            loop all players:
+                if arg 1 is loop-player:
+                    set {_exist} to true
+
+            if {_exist} is true:
+                message "&a&o    - Last 10 Deaths -    "
+                loop 10 times:
+                    set {_loop} to {index::%arg 1's uuid%} + loop-number - 1
+                    if {_loop} >= 11:
+                        remove 10 from {_loop}
+
+                    execute player command "/minecraft:tellraw @s {""text"":""&e&n%{data::%arg 1's uuid%::nows::%{_loop}%}%&r"", ""clickEvent"":{""action"":""run_command"", ""value"":""/pbinv %arg 1% %{_loop}%""}}"
+                message "&a&o    - Lastest Death -    "
+            
+            else:
+                message "&e&oThere is no player"
+        else:
+            message "&c&oOP required"
+
+
+
+command /pbinv [<player>] [<integer>]:
+    trigger:
+        if player is op:
+            set {%player's uuid%::viewer} to chest inventory with 6 rows named "&2&l%{data::%arg 1's uuid%::nows::%arg 2%}%"
+            loop {data::%arg 1's uuid%::inv::%arg 2%::*}:
+                set slot loop-index parsed as number of {%player's uuid%::viewer} to loop-value
+            loop 9 times:
+                set slot 44 + loop-number of {%player's uuid%::viewer} to gray stained glass pane named " "
+            set slot 49 of {%player's uuid%::viewer} to writable book named "&f&l%name of arg 1%" with lore " " and "&e&lCause: &o%{data::%arg 1's uuid%::cause::%arg 2%}%" and "&f&lAttacker: &o%{data::%arg 1's uuid%::attacker::%arg 2%}%" and "&e&o%{data::%arg 1's uuid%::pos::%arg 2%}%"
+            open {%player's uuid%::viewer} to player
+        else:
+            message "&c&oOP required"
+
+
+
+command /pbremoveall:
+    trigger:
+        if player is op:
+            delete {index::*}
+            delete {data::*}
+            message "&e&oDeleted all logs"
+        else:
+            message "&c&oOP required"
